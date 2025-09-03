@@ -46,6 +46,18 @@ public class TodoController {
         return todoService.createTodo(request);
     }
     
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @Operation(
+        summary = "Delete a todo",
+        description = "Deletes a todo by ID for the current user"
+    )
+    @ApiResponse(responseCode = "204", description = "Todo deleted successfully")
+    @ApiResponse(responseCode = "404", description = "Todo not found")
+    public void deleteTodo(@PathVariable Long id) {
+        todoService.deleteTodo(id);
+    }
+    
     @PatchMapping("/{id}/toggle")
     @Operation(
         summary = "Toggle todo completion status",

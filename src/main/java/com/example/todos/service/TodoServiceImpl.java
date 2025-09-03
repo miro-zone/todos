@@ -61,6 +61,16 @@ public class TodoServiceImpl implements TodoService {
         return mapToResponse(updatedTodo);
     }
 
+    @Override
+    @Transactional
+    public void deleteTodo(Long todoId) {
+        User currentUser = findAuthenticatedUser.getAuthenticatedUser();
+        Todo todo = todoRepository.findByIdAndOwner(todoId, currentUser)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Todo not found"));
+        
+        todoRepository.delete(todo);
+    }
+
     private TodoResponse mapToResponse(Todo todo) {
         return TodoResponse.builder()
                 .id(todo.getId())
