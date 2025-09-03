@@ -10,6 +10,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
 @RequiredArgsConstructor
 public class TodoServiceImpl implements TodoService {
@@ -35,6 +38,16 @@ public class TodoServiceImpl implements TodoService {
         return mapToResponse(savedTodo);
     }
     
+    @Override
+    @Transactional(readOnly = true)
+    public List<TodoResponse> getAllTodos() {
+        User currentUser = findAuthenticatedUser.getAuthenticatedUser();
+        List<Todo> todos = todoRepository.findByOwner(currentUser);
+        return todos.stream()
+                .map(this::mapToResponse)
+                .collect(Collectors.toList());
+    }
+
     private TodoResponse mapToResponse(Todo todo) {
         return TodoResponse.builder()
                 .id(todo.getId())

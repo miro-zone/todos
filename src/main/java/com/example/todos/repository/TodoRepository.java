@@ -1,7 +1,11 @@
 package com.example.todos.repository;
 
 import com.example.todos.entity.Todo;
+import com.example.todos.entity.User;
 import org.springframework.data.repository.CrudRepository;
 
+import java.util.List;
+
 public interface TodoRepository extends CrudRepository<Todo, Long> {
+    List<Todo> findByOwner(User owner);
 }

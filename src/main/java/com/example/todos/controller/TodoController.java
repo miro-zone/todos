@@ -12,6 +12,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/todos")
 @RequiredArgsConstructor
@@ -19,6 +21,19 @@ import org.springframework.web.bind.annotation.*;
 public class TodoController {
 
     private final TodoService todoService;
+
+    @GetMapping
+    @Operation(
+        summary = "Get all todos for current user",
+        description = "Retrieves all todos for the currently authenticated user"
+    )
+    @ApiResponse(
+        responseCode = "200",
+        description = "Successfully retrieved todos"
+    )
+    public ResponseEntity<List<TodoResponse>> getAllTodos() {
+        return ResponseEntity.ok(todoService.getAllTodos());
+    }
 
     @PostMapping
     @Operation(
