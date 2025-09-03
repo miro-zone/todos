@@ -36,17 +36,24 @@ public class TodoController {
     }
 
     @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
     @Operation(
         summary = "Create a new todo",
-        description = "Creates a new todo for the authenticated user"
+        description = "Creates a new todo for the current user"
     )
-    @ApiResponse(
-        responseCode = "201",
-        description = "Todo created successfully"
+    @ApiResponse(responseCode = "201", description = "Todo created successfully")
+    public TodoResponse createTodo(@Valid @RequestBody TodoRequest request) {
+        return todoService.createTodo(request);
+    }
+    
+    @PatchMapping("/{id}/toggle")
+    @Operation(
+        summary = "Toggle todo completion status",
+        description = "Toggles the completion status of a todo"
     )
-    public ResponseEntity<TodoResponse> createTodo(
-            @Valid @RequestBody TodoRequest request) {
-        TodoResponse response = todoService.createTodo(request);
-        return new ResponseEntity<>(response, HttpStatus.CREATED);
+    @ApiResponse(responseCode = "200", description = "Todo completion status toggled successfully")
+    @ApiResponse(responseCode = "404", description = "Todo not found")
+    public TodoResponse toggleTodoCompletion(@PathVariable Long id) {
+        return todoService.toggleTodoCompletion(id);
     }
 }

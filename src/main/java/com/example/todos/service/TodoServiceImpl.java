@@ -7,8 +7,10 @@ import com.example.todos.request.TodoRequest;
 import com.example.todos.response.TodoResponse;
 import com.example.todos.util.FindAuthenticatedUser;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -42,10 +44,21 @@ public class TodoServiceImpl implements TodoService {
     @Transactional(readOnly = true)
     public List<TodoResponse> getAllTodos() {
         User currentUser = findAuthenticatedUser.getAuthenticatedUser();
-        List<Todo> todos = todoRepository.findByOwner(currentUser);
-        return todos.stream()
+        return todoRepository.findByOwner(currentUser).stream()
                 .map(this::mapToResponse)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional
+    public TodoResponse toggleTodoCompletion(Long todoId) {
+        User currentUser = findAuthenticatedUser.getAuthenticatedUser();
+        Todo todo = todoRepository.findByIdAndOwner(todoId, currentUser)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Todo not found"));
+        
+        todo.setComplete(!todo.isComplete());
+        Todo updatedTodo = todoRepository.save(todo);
+        return mapToResponse(updatedTodo);
     }
 
     private TodoResponse mapToResponse(Todo todo) {
